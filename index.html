@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Humour & Gags - Vidéos Plein Écran</title>
 
   <!-- Bootstrap -->
@@ -85,14 +85,14 @@
       position: relative;
       background: #000;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      margin-bottom: 30px;
     }
     #contentArea {
       width: 100vw;
-      height: calc(100vh - 240px);
+      height: 65vh; /* Hauteur réduite */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -110,7 +110,7 @@
     .short-container {
       width: 100%;
       max-width: 400px;
-      height: calc(100vh - 240px);
+      height: 65vh; /* Hauteur réduite */
       margin: 0 auto;
     }
 
@@ -191,12 +191,41 @@
       transform: scale(1.2);
     }
 
+    /* Bouton partager centré */
+    #shareBtnContainer {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    
+    #shareBtn {
+      background: rgba(240, 165, 0, 0.85);
+      color: #121212;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    #shareBtn:hover {
+      background: rgba(240, 165, 0, 1);
+      transform: scale(1.05);
+    }
+
     footer {
       font-size: 0.9rem;
       opacity: 0.7;
       letter-spacing: 1px;
       padding: 15px 0;
-      margin-top: 20px;
       text-align: center;
     }
 
@@ -259,29 +288,6 @@
       background: #ffbf47;
     }
 
-    #shareBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(240, 165, 0, 0.85);
-      color: #121212;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 25px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 2500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      font-size: 0.9rem;
-    }
-
-    #shareBtn:hover {
-      background: rgba(240, 165, 0, 1);
-    }
-
     .close-btn {
       background: #ff4444 !important;
       color: white !important;
@@ -300,46 +306,83 @@
       background: #ff6666 !important;
     }
 
-    @media (max-width: 576px) {
+    @media (max-width: 768px) {
       header h1 {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
+        padding: 0 10px;
       }
+      
       header p {
-        font-size: 0.85rem;
-      }
-      marquee {
         font-size: 0.9rem;
       }
+      
+      marquee {
+        font-size: 0.8rem;
+      }
+      
       #contentArea {
-        height: calc(100vh - 210px);
+        height: 55vh; /* Hauteur réduite sur mobile */
       }
+      
       .short-container {
-        height: calc(100vh - 210px);
+        max-width: 100%;
+        height: 55vh; /* Hauteur réduite sur mobile */
       }
+      
       #controlBar {
-        gap: 20px;
-        padding: 8px 20px;
         bottom: 60px;
+        padding: 8px 20px;
+        gap: 25px;
       }
+      
       #controlBar button {
         font-size: 2rem;
       }
-      #skipBtn {
-        font-size: 1rem;
-        padding: 8px 20px;
-        margin-top: 15px;
-      }
-      .share-box {
-        width: 85%;
-        padding: 12px;
-      }
+      
       #shareBtn {
         font-size: 0.8rem;
-        padding: 6px 12px;
+        padding: 8px 15px;
       }
+      
+      .share-box {
+        width: 90%;
+        padding: 15px;
+      }
+      
       footer {
-        padding: 10px 0;
-        margin-top: 15px;
+        font-size: 0.8rem;
+        padding: 10px 5px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      #contentArea {
+        height: 50vh; /* Hauteur encore plus réduite sur petits écrans */
+      }
+      
+      .short-container {
+        height: 50vh; /* Hauteur encore plus réduite sur petits écrans */
+      }
+      
+      #controlBar {
+        bottom: 50px;
+        gap: 20px;
+        padding: 6px 15px;
+      }
+      
+      #controlBar button {
+        font-size: 1.8rem;
+      }
+      
+      .pub-message {
+        font-size: 1.2rem;
+        padding: 0 15px;
+        text-align: center;
+      }
+      
+      #skipBtn {
+        font-size: 0.9rem;
+        padding: 8px 15px;
       }
     }
   </style>
@@ -363,7 +406,8 @@
   </header>
 
   <div class="content-wrapper">
-    <div id="contentArea">
+    <div id="contentArea"></div>
+    <div id="shareBtnContainer">
       <button id="shareBtn">
         <i class="fa-solid fa-share"></i> Partager une vidéo
       </button>
@@ -423,6 +467,7 @@
     const videoTitle = document.getElementById("videoTitle");
     const notification = document.getElementById("notification");
     const notificationText = document.getElementById("notification-text");
+    const shareBtn = document.getElementById("shareBtn");
 
     let isPlaying = true;
     let isPub = false;
@@ -467,19 +512,17 @@
       return null;
     }
 
-    // Gestion des événements de partage - VERSION CORRIGÉE
+    // Gestion des événements de partage
     function setupShareEvents() {
-      // Gestion du bouton share avec délégation d'événements
+      // Ouvrir la boîte de partage
+      shareBtn.onclick = function(e) {
+        e.preventDefault();
+        shareBox.style.display = 'block';
+      };
+      
+      // Fermer si clic en dehors
       document.addEventListener('click', function(e) {
-        // Ouvrir la boîte de partage
-        if (e.target.id === 'shareBtn' || e.target.closest('#shareBtn')) {
-          shareBox.style.display = 'block';
-          e.stopPropagation();
-          return;
-        }
-        
-        // Fermer si clic en dehors
-        if (!shareBox.contains(e.target)) {
+        if (!shareBox.contains(e.target) && e.target !== shareBtn) {
           shareBox.style.display = 'none';
         }
       });
@@ -537,23 +580,9 @@
                           (videoLink.value.includes('shorts') && !videoId.includes('shorts'));
       
       // Créer le conteneur approprié
-      if (currentVideoIsShort) {
-        contentArea.innerHTML = `
-          <div class="short-container">
-            <div id="player"></div>
-          </div>
-          <button id="shareBtn">
-            <i class="fa-solid fa-share"></i> Partager une vidéo
-          </button>
-        `;
-      } else {
-        contentArea.innerHTML = `
-          <div id="player"></div>
-          <button id="shareBtn">
-            <i class="fa-solid fa-share"></i> Partager une vidéo
-          </button>
-        `;
-      }
+      contentArea.innerHTML = currentVideoIsShort ? 
+        `<div class="short-container"><div id="player"></div></div>` : 
+        `<div id="player"></div>`;
       
       player = new YT.Player('player', {
         height: '100%',
@@ -577,7 +606,10 @@
             
             // Adapter l'aspect pour les Shorts
             if (currentVideoIsShort) {
-              event.target.setSize(400, 711); // Ratio 9:16 pour les Shorts
+              const isMobile = window.innerWidth <= 768;
+              const width = isMobile ? window.innerWidth : 400;
+              const height = isMobile ? width * 1.77 : 711;
+              event.target.setSize(width, height);
             }
           }
         }
@@ -589,25 +621,38 @@
       currentVideoIsShort = false;
       const pubIndex = Math.floor(Math.random() * pubs.length);
       const pub = pubs[pubIndex];
+      
+      // Texte adapté pour mobile
+      const isMobile = window.innerWidth <= 768;
+      const pubText = isMobile ? pub.texte.replace(/!.*/, "!") : pub.texte;
+      
       contentArea.innerHTML = `
         <div class="pub-message" role="alert" aria-live="assertive">
-          ${pub.texte} <br>
-          <a href="${pub.lien}" target="_blank" rel="noopener noreferrer">Cliquez ici</a>
+          ${pubText} <br>
+          <a href="${pub.lien}" target="_blank" rel="noopener noreferrer">
+            ${isMobile ? "Visiter" : "Cliquez ici"}
+          </a>
         </div>
-        <button id="skipBtn" disabled>Passer la pub (5)</button>
       `;
-      controlBar.style.display = 'flex';
-
-      const skipBtn = document.getElementById('skipBtn');
-      let countdown = 5;
+      
+      // Créer le bouton skip séparément
+      const skipBtn = document.createElement('button');
+      skipBtn.id = 'skipBtn';
+      skipBtn.disabled = true;
+      skipBtn.textContent = isMobile ? `Pub (5)` : `Passer la pub (5)`;
       skipBtn.style.opacity = '0.5';
       skipBtn.style.pointerEvents = 'none';
+      
+      document.getElementById('shareBtnContainer').prepend(skipBtn);
+      controlBar.style.display = 'flex';
 
+      let countdown = 5;
+      
       skipBtnTimeout = setInterval(() => {
         countdown--;
-        skipBtn.textContent = `Passer la pub (${countdown})`;
+        skipBtn.textContent = isMobile ? `Pub (${countdown})` : `Passer la pub (${countdown})`;
         if (countdown <= 0) {
-          skipBtn.textContent = 'Passer la pub';
+          skipBtn.textContent = isMobile ? 'Passer' : 'Passer la pub';
           skipBtn.disabled = false;
           skipBtn.style.opacity = '1';
           skipBtn.style.pointerEvents = 'auto';
@@ -618,14 +663,16 @@
 
       skipBtn.addEventListener('click', () => {
         clearInterval(skipBtnTimeout);
+        skipBtn.remove();
         playNextContent();
       });
 
       setTimeout(() => {
         if (!skipBtn.disabled) return;
         clearInterval(skipBtnTimeout);
+        skipBtn.remove();
         playNextContent();
-      }, 8000);
+      }, isMobile ? 5000 : 8000);
     }
 
     function onPlayerStateChange(event) {
@@ -679,6 +726,22 @@
     // Contrôles vidéo
     playPauseBtn.addEventListener('click', togglePlayPause);
     nextBtn.addEventListener('click', playNextContent);
+
+    // Gestion du tactile pour mobile
+    let lastTap = 0;
+    [playPauseBtn, nextBtn].forEach(btn => {
+      btn.addEventListener('touchend', function(e) {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        if (tapLength < 500 && tapLength > 0) {
+          e.preventDefault();
+          return;
+        }
+        lastTap = currentTime;
+        if (btn === playPauseBtn) togglePlayPause();
+        else playNextContent();
+      });
+    });
 
     if (window.YT && YT.Player) {
       onYouTubeIframeAPIReady();
