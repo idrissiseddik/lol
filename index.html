@@ -23,6 +23,13 @@
       overflow: hidden;
     }
 
+    /* Masquer les éléments YouTube de manière plus légère */
+    .ytp-chrome-top,
+    .ytp-title-text,
+    .ytp-watermark {
+      display: none !important;
+    }
+
     /* Notification */
     .notification-container {
       position: fixed;
@@ -92,12 +99,13 @@
     }
     #contentArea {
       width: 100vw;
-      height: 65vh; /* Hauteur réduite */
+      height: 65vh;
       display: flex;
       justify-content: center;
       align-items: center;
       position: relative;
     }
+    
     iframe, .pub-message {
       width: 100%;
       height: 100%;
@@ -110,7 +118,7 @@
     .short-container {
       width: 100%;
       max-width: 400px;
-      height: 65vh; /* Hauteur réduite */
+      height: 65vh;
       margin: 0 auto;
     }
 
@@ -321,12 +329,12 @@
       }
       
       #contentArea {
-        height: 55vh; /* Hauteur réduite sur mobile */
+        height: 55vh;
       }
       
       .short-container {
         max-width: 100%;
-        height: 55vh; /* Hauteur réduite sur mobile */
+        height: 55vh;
       }
       
       #controlBar {
@@ -357,11 +365,11 @@
 
     @media (max-width: 576px) {
       #contentArea {
-        height: 50vh; /* Hauteur encore plus réduite sur petits écrans */
+        height: 50vh;
       }
       
       .short-container {
-        height: 50vh; /* Hauteur encore plus réduite sur petits écrans */
+        height: 50vh;
       }
       
       #controlBar {
@@ -474,7 +482,6 @@
     let videosSinceLastPub = 0;
     let currentVideoIsShort = false;
 
-    // Fonction pour afficher les notifications
     function showNotification(message, duration = 3000) {
       notificationText.textContent = message;
       notification.style.display = 'flex';
@@ -484,14 +491,11 @@
       }, duration);
     }
 
-    // Fonction améliorée pour extraire l'ID YouTube (version compatible Shorts)
     function extractYouTubeId(url) {
-      // Si c'est déjà un ID (11 caractères)
       if (url.length === 11 && !url.includes('/') && !url.includes('=')) {
         return url;
       }
       
-      // Pattern pour les différents formats de liens YouTube (incluant Shorts)
       const patterns = [
         /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i,
         /^([^"&?\/\s]{11})$/,
@@ -512,29 +516,21 @@
       return null;
     }
 
-    // Gestion des événements de partage
     function setupShareEvents() {
-      // Ouvrir la boîte de partage
-      shareBtn.onclick = function(e) {
+      // Bouton partager
+      shareBtn.addEventListener('click', function(e) {
         e.preventDefault();
         shareBox.style.display = 'block';
-      };
-      
-      // Fermer si clic en dehors
-      document.addEventListener('click', function(e) {
-        if (!shareBox.contains(e.target) && e.target !== shareBtn) {
-          shareBox.style.display = 'none';
-        }
       });
-
-      // Bouton fermer
-      closeShareBox.onclick = function(e) {
+      
+      // Fermer la boîte de partage
+      closeShareBox.addEventListener('click', function(e) {
         e.preventDefault();
         shareBox.style.display = 'none';
-      };
+      });
 
       // Envoyer via WhatsApp
-      sendBtn.onclick = function(e) {
+      sendBtn.addEventListener('click', function(e) {
         e.preventDefault();
         const link = videoLink.value.trim();
         const title = videoTitle.value.trim() || 'Vidéo humoristique';
@@ -555,31 +551,26 @@
         const whatsappUrl = `https://wa.me/212608975435?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
         
-        // Réinitialiser et fermer
         videoLink.value = '';
         videoTitle.value = '';
         shareBox.style.display = 'none';
         showNotification('Votre vidéo a été partagée avec succès !');
-        return false;
-      };
+      });
     }
 
     function onYouTubeIframeAPIReady() {
       setupShareEvents();
       playNextContent();
       
-      // Exemple de notification au chargement
       setTimeout(() => {
         showNotification('Bienvenue sur Humour & Gags ! Profitez des vidéos et shorts.');
       }, 1000);
     }
 
     function createPlayer(videoId) {
-      // Détecter si c'est un Short
       currentVideoIsShort = videoId.includes('shorts') || 
                           (videoLink.value.includes('shorts') && !videoId.includes('shorts'));
       
-      // Créer le conteneur approprié
       contentArea.innerHTML = currentVideoIsShort ? 
         `<div class="short-container"><div id="player"></div></div>` : 
         `<div id="player"></div>`;
@@ -596,7 +587,9 @@
           disablekb: 1,
           fs: 0,
           iv_load_policy: 3,
-          playsinline: 1
+          playsinline: 1,
+          showinfo: 0,
+          enablejsapi: 1
         },
         events: {
           'onStateChange': onPlayerStateChange,
@@ -604,7 +597,24 @@
             isPlaying = true;
             updatePlayPauseIcon();
             
-            // Adapter l'aspect pour les Shorts
+            // Solution simplifiée pour masquer les éléments
+            setTimeout(() => {
+              try {
+                const iframe = document.querySelector('iframe');
+                if (iframe) {
+                  const style = document.createElement('style');
+                  style.textContent = `
+                    .ytp-chrome-top, .ytp-title-text, .ytp-watermark {
+                      display: none !important;
+                    }
+                  `;
+                  iframe.contentDocument.head.appendChild(style);
+                }
+              } catch(e) {
+                console.log("Masquage des éléments YouTube échoué");
+              }
+            }, 1000);
+            
             if (currentVideoIsShort) {
               const isMobile = window.innerWidth <= 768;
               const width = isMobile ? window.innerWidth : 400;
@@ -622,7 +632,6 @@
       const pubIndex = Math.floor(Math.random() * pubs.length);
       const pub = pubs[pubIndex];
       
-      // Texte adapté pour mobile
       const isMobile = window.innerWidth <= 768;
       const pubText = isMobile ? pub.texte.replace(/!.*/, "!") : pub.texte;
       
@@ -635,7 +644,6 @@
         </div>
       `;
       
-      // Créer le bouton skip séparément
       const skipBtn = document.createElement('button');
       skipBtn.id = 'skipBtn';
       skipBtn.disabled = true;
@@ -703,9 +711,12 @@
       if (!player || isPub) return;
       if (isPlaying) {
         player.pauseVideo();
+        isPlaying = false;
       } else {
         player.playVideo();
+        isPlaying = true;
       }
+      updatePlayPauseIcon();
     }
 
     function playNextContent() {
@@ -745,6 +756,12 @@
 
     if (window.YT && YT.Player) {
       onYouTubeIframeAPIReady();
+    } else {
+      // Fallback si l'API YouTube ne se charge pas
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
   </script>
 </body>
