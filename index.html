@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Humour & Gags - Vidéos Plein Écran</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet" />
+
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: #121212;
+      color: #eee;
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Notification */
+    .notification-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 4000;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .notification {
+      background-color: #dc3545;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      display: none;
+      animation: slideDown 0.5s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+    }
+
+    header {
+      flex-shrink: 0;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      backdrop-filter: blur(8px);
+      background: rgba(18,18,18,0.7);
+      user-select: none;
+      z-index: 2000;
+    }
+    header h1 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.8rem;
+      letter-spacing: 1.5px;
+    }
+    header p {
+      margin: 0;
+      font-weight: 400;
+      font-size: 1rem;
+      opacity: 0.7;
+    }
+    marquee {
+      margin-top: 6px;
+      color: #f0a500;
+      font-weight: 600;
+      font-size: 1rem;
+      user-select: none;
+    }
+
+    /* Container vidéo & pub */
+    .content-wrapper {
+      flex-grow: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+    #contentArea {
+      width: 100vw;
+      height: calc(100vh - 240px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    iframe, .pub-message {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0;
+      box-sizing: border-box;
+    }
+
+    /* Style spécifique pour les Shorts */
+    .short-container {
+      width: 100%;
+      max-width: 400px;
+      height: calc(100vh - 240px);
+      margin: 0 auto;
+    }
+
+    .pub-message {
+      background: #222;
+      color: #f0a500;
+      font-weight: 700;
+      font-size: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+    }
+    .pub-message a {
+      color: #ffb347;
+      text-decoration: underline;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+    .pub-message a:hover {
+      color: #ffd46f;
+    }
+
+    #skipBtn {
+      margin-top: 20px;
+      background: #f0a500;
+      border: none;
+      color: #121212;
+      font-weight: 700;
+      font-size: 1.2rem;
+      padding: 10px 25px;
+      border-radius: 50px;
+      cursor: not-allowed;
+      user-select: none;
+      transition: background-color 0.3s, transform 0.2s;
+      pointer-events: none;
+      position: relative;
+      bottom: 25px;
+      align-self: center;
+      width: fit-content;
+    }
+    #skipBtn.enabled {
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    #skipBtn.enabled:hover {
+      background-color: #ffbf47;
+      transform: scale(1.05);
+    }
+
+    /* Barre de contrôle */
+    #controlBar {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(240, 165, 0, 0.85);
+      padding: 10px 30px;
+      border-radius: 40px;
+      box-shadow: 0 0 15px rgba(240, 165, 0, 0.7);
+      display: flex;
+      gap: 30px;
+      z-index: 3000;
+      user-select: none;
+    }
+    #controlBar button {
+      background: transparent;
+      border: none;
+      color: #121212;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: color 0.3s ease, transform 0.2s ease;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
+    }
+    #controlBar button:hover {
+      color: #fff;
+      transform: scale(1.2);
+    }
+
+    footer {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      letter-spacing: 1px;
+      padding: 15px 0;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    /* Boîte de partage */
+    .share-box {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(18, 18, 18, 0.95);
+      padding: 15px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      z-index: 2500;
+      backdrop-filter: blur(5px);
+      border: 1px solid #f0a500;
+      box-shadow: 0 0 15px rgba(240, 165, 0, 0.3);
+      display: none;
+    }
+
+    .share-box h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #f0a500;
+      font-size: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .share-box p {
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .share-box input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      background: #222;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .share-box button {
+      background: #f0a500;
+      color: #121212;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .share-box button:hover {
+      background: #ffbf47;
+    }
+
+    #shareBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(240, 165, 0, 0.85);
+      color: #121212;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 2500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      font-size: 0.9rem;
+    }
+
+    #shareBtn:hover {
+      background: rgba(240, 165, 0, 1);
+    }
+
+    .close-btn {
+      background: #ff4444 !important;
+      color: white !important;
+      padding: 5px 10px !important;
+      font-size: 0.8rem !important;
+      border-radius: 50% !important;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      background: #ff6666 !important;
+    }
+
+    @media (max-width: 576px) {
+      header h1 {
+        font-size: 1.4rem;
+      }
+      header p {
+        font-size: 0.85rem;
+      }
+      marquee {
+        font-size: 0.9rem;
+      }
+      #contentArea {
+        height: calc(100vh - 210px);
+      }
+      .short-container {
+        height: calc(100vh - 210px);
+      }
+      #controlBar {
+        gap: 20px;
+        padding: 8px 20px;
+        bottom: 60px;
+      }
+      #controlBar button {
+        font-size: 2rem;
+      }
+      #skipBtn {
+        font-size: 1rem;
+        padding: 8px 20px;
+        margin-top: 15px;
+      }
+      .share-box {
+        width: 85%;
+        padding: 12px;
+      }
+      #shareBtn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+      }
+      footer {
+        padding: 10px 0;
+        margin-top: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Notification -->
+  <div class="notification-container">
+    <div id="notification" class="notification alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      <span id="notification-text">Message de notification</span>
+    </div>
+  </div>
+
+  <header>
+    <h1><i class="fa-solid fa-face-laugh-beam"></i> Humour & Gags</h1>
+    <p>Riez sans limite avec nos vidéos !</p>
+    <marquee direction="left" scrollamount="6" behavior="scroll" onmouseover="this.stop()" onmouseout="this.start()">
+      Bienvenue sur notre chaîne de vidéos humoristiques — Préparez-vous à rire sans limite !
+    </marquee>
+  </header>
+
+  <div class="content-wrapper">
+    <div id="contentArea">
+      <button id="shareBtn">
+        <i class="fa-solid fa-share"></i> Partager une vidéo
+      </button>
+    </div>
+  </div>
+
+  <div class="share-box" id="shareBox">
+    <h3>
+      <span>Partagez avec la communauté</span>
+      <button class="close-btn" id="closeShareBox" aria-label="Fermer">&times;</button>
+    </h3>
+    <p>Envoyez-nous vos liens YouTube (vidéos ou shorts) humoristiques</p>
+    <input type="text" id="videoLink" placeholder="Coller le lien YouTube ici..." />
+    <input type="text" id="videoTitle" placeholder="Titre de la vidéo (optionnel)" />
+    <button id="sendBtn">Envoyer via WhatsApp</button>
+  </div>
+
+  <div id="controlBar" aria-label="Contrôles vidéo">
+    <button id="playPauseBtn" aria-label="Pause la vidéo"><i class="fa-solid fa-pause"></i></button>
+    <button id="nextBtn" aria-label="Vidéo suivante"><i class="fa-solid fa-forward"></i></button>
+  </div>
+
+  <footer class="text-center">
+    © 2025 - Humour & Gags | Créé par M. Seddik Elidrissi
+  </footer>
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const videos = [
+      "Hn5gkhESyYA",
+      "UcHaW8z9TVI",
+      "g3Z2H0oVXao",
+      "fTOlvoBJ5oA",
+      "qAY-epA0CBI",
+      "9NZBRW99TPw&t"
+    ];
+
+    const pubs = [
+      { texte: "Découvrez notre site ami Radio Coran !", lien: "https://radiocoran.vercel.app" },
+      { texte: "Devenir un partenaire et publier votre site ici !", lien: "https://mescreations.vercel.app" },
+      { texte: "Un clic pour vendre..un clic pour acheter.. Découvrez votre market entre particuliers", lien: "https://lemarket.vercel.app" }
+    ];
+
+    let player;
+    let skipBtnTimeout;
+    const contentArea = document.getElementById("contentArea");
+    const controlBar = document.getElementById("controlBar");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const shareBox = document.getElementById("shareBox");
+    const closeShareBox = document.getElementById("closeShareBox");
+    const sendBtn = document.getElementById("sendBtn");
+    const videoLink = document.getElementById("videoLink");
+    const videoTitle = document.getElementById("videoTitle");
+    const notification = document.getElementById("notification");
+    const notificationText = document.getElementById("notification-text");
+
+    let isPlaying = true;
+    let isPub = false;
+    let videosSinceLastPub = 0;
+    let currentVideoIsShort = false;
+
+    // Fonction pour afficher les notifications
+    function showNotification(message, duration = 3000) {
+      notificationText.textContent = message;
+      notification.style.display = 'flex';
+      
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, duration);
+    }
+
+    // Fonction améliorée pour extraire l'ID YouTube (version compatible Shorts)
+    function extractYouTubeId(url) {
+      // Si c'est déjà un ID (11 caractères)
+      if (url.length === 11 && !url.includes('/') && !url.includes('=')) {
+        return url;
+      }
+      
+      // Pattern pour les différents formats de liens YouTube (incluant Shorts)
+      const patterns = [
+        /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i,
+        /^([^"&?\/\s]{11})$/,
+        /[?&]v=([^"&?\/\s]{11})/,
+        /[?&]vi=([^"&?\/\s]{11})/,
+        /embed\/([^"&?\/\s]{11})/,
+        /youtu\.be\/([^"&?\/\s]{11})/,
+        /shorts\/([^"&?\/\s]{11})/
+      ];
+      
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+      
+      return null;
+    }
+
+    // Gestion des événements de partage - VERSION CORRIGÉE
+    function setupShareEvents() {
+      // Gestion du bouton share avec délégation d'événements
+      document.addEventListener('click', function(e) {
+        // Ouvrir la boîte de partage
+        if (e.target.id === 'shareBtn' || e.target.closest('#shareBtn')) {
+          shareBox.style.display = 'block';
+          e.stopPropagation();
+          return;
+        }
+        
+        // Fermer si clic en dehors
+        if (!shareBox.contains(e.target)) {
+          shareBox.style.display = 'none';
+        }
+      });
+
+      // Bouton fermer
+      closeShareBox.onclick = function(e) {
+        e.preventDefault();
+        shareBox.style.display = 'none';
+      };
+
+      // Envoyer via WhatsApp
+      sendBtn.onclick = function(e) {
+        e.preventDefault();
+        const link = videoLink.value.trim();
+        const title = videoTitle.value.trim() || 'Vidéo humoristique';
+        
+        if (!link) {
+          showNotification('Veuillez entrer un lien YouTube valide');
+          return false;
+        }
+
+        const videoId = extractYouTubeId(link);
+        
+        if (!videoId) {
+          showNotification('Lien YouTube non valide. Formats acceptés:\n- Vidéos: https://youtu.be/ID\n- Shorts: https://youtube.com/shorts/ID\n- ID seul (11 caractères)');
+          return false;
+        }
+
+        const message = `Bonjour, je souhaite partager cette vidéo ${link.includes('shorts') ? 'YouTube Short' : 'YouTube'}:\n\nTitre: ${title}\nLien: ${link.includes('shorts') ? link : 'https://youtu.be/'+videoId}`;
+        const whatsappUrl = `https://wa.me/212608975435?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        
+        // Réinitialiser et fermer
+        videoLink.value = '';
+        videoTitle.value = '';
+        shareBox.style.display = 'none';
+        showNotification('Votre vidéo a été partagée avec succès !');
+        return false;
+      };
+    }
+
+    function onYouTubeIframeAPIReady() {
+      setupShareEvents();
+      playNextContent();
+      
+      // Exemple de notification au chargement
+      setTimeout(() => {
+        showNotification('Bienvenue sur Humour & Gags ! Profitez des vidéos et shorts.');
+      }, 1000);
+    }
+
+    function createPlayer(videoId) {
+      // Détecter si c'est un Short
+      currentVideoIsShort = videoId.includes('shorts') || 
+                          (videoLink.value.includes('shorts') && !videoId.includes('shorts'));
+      
+      // Créer le conteneur approprié
+      if (currentVideoIsShort) {
+        contentArea.innerHTML = `
+          <div class="short-container">
+            <div id="player"></div>
+          </div>
+          <button id="shareBtn">
+            <i class="fa-solid fa-share"></i> Partager une vidéo
+          </button>
+        `;
+      } else {
+        contentArea.innerHTML = `
+          <div id="player"></div>
+          <button id="shareBtn">
+            <i class="fa-solid fa-share"></i> Partager une vidéo
+          </button>
+        `;
+      }
+      
+      player = new YT.Player('player', {
+        height: '100%',
+        width: '100%',
+        videoId: videoId.replace('shorts/', ''),
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          disablekb: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          playsinline: 1
+        },
+        events: {
+          'onStateChange': onPlayerStateChange,
+          'onReady': (event) => {
+            isPlaying = true;
+            updatePlayPauseIcon();
+            
+            // Adapter l'aspect pour les Shorts
+            if (currentVideoIsShort) {
+              event.target.setSize(400, 711); // Ratio 9:16 pour les Shorts
+            }
+          }
+        }
+      });
+    }
+
+    function showPub() {
+      isPub = true;
+      currentVideoIsShort = false;
+      const pubIndex = Math.floor(Math.random() * pubs.length);
+      const pub = pubs[pubIndex];
+      contentArea.innerHTML = `
+        <div class="pub-message" role="alert" aria-live="assertive">
+          ${pub.texte} <br>
+          <a href="${pub.lien}" target="_blank" rel="noopener noreferrer">Cliquez ici</a>
+        </div>
+        <button id="skipBtn" disabled>Passer la pub (5)</button>
+      `;
+      controlBar.style.display = 'flex';
+
+      const skipBtn = document.getElementById('skipBtn');
+      let countdown = 5;
+      skipBtn.style.opacity = '0.5';
+      skipBtn.style.pointerEvents = 'none';
+
+      skipBtnTimeout = setInterval(() => {
+        countdown--;
+        skipBtn.textContent = `Passer la pub (${countdown})`;
+        if (countdown <= 0) {
+          skipBtn.textContent = 'Passer la pub';
+          skipBtn.disabled = false;
+          skipBtn.style.opacity = '1';
+          skipBtn.style.pointerEvents = 'auto';
+          skipBtn.classList.add('enabled');
+          clearInterval(skipBtnTimeout);
+        }
+      }, 1000);
+
+      skipBtn.addEventListener('click', () => {
+        clearInterval(skipBtnTimeout);
+        playNextContent();
+      });
+
+      setTimeout(() => {
+        if (!skipBtn.disabled) return;
+        clearInterval(skipBtnTimeout);
+        playNextContent();
+      }, 8000);
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.ENDED) {
+        isPlaying = false;
+        updatePlayPauseIcon();
+        playNextContent();
+      } else if (event.data === YT.PlayerState.PLAYING) {
+        isPlaying = true;
+        updatePlayPauseIcon();
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        isPlaying = false;
+        updatePlayPauseIcon();
+      }
+    }
+
+    function updatePlayPauseIcon() {
+      if (isPlaying) {
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        playPauseBtn.setAttribute('aria-label', 'Pause la vidéo');
+      } else {
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+        playPauseBtn.setAttribute('aria-label', 'Jouer la vidéo');
+      }
+    }
+
+    function togglePlayPause() {
+      if (!player || isPub) return;
+      if (isPlaying) {
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+    }
+
+    function playNextContent() {
+      isPub = false;
+      controlBar.style.display = 'flex';
+
+      videosSinceLastPub++;
+
+      if (videosSinceLastPub >= 4) {
+        videosSinceLastPub = 0;
+        showPub();
+      } else {
+        const videoId = videos[Math.floor(Math.random() * videos.length)];
+        createPlayer(videoId);
+      }
+    }
+
+    // Contrôles vidéo
+    playPauseBtn.addEventListener('click', togglePlayPause);
+    nextBtn.addEventListener('click', playNextContent);
+
+    if (window.YT && YT.Player) {
+      onYouTubeIframeAPIReady();
+    }
+  </script>
+</body>
+</html>
