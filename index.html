@@ -1,768 +1,1121 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Humour & Gags - Vidéos Plein Écran</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Humour - Gags et Rires</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --main-color: #FF6B00;
+            --dark-bg: #121212;
+            --darker-bg: #0A0A0A;
+        }
+        
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet" />
+        /* Notification style */
+        .notification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #ff4444;
+            color: white;
+            padding: 8px 15px;
+            text-align: center;
+            z-index: 1100;
+            display: none;
+            animation: slideDown 0.5s ease-out;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
 
-  <style>
-    html, body {
-      margin: 0; padding: 0; height: 100%;
-      background: #121212;
-      color: #eee;
-      font-family: 'Montserrat', sans-serif;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+        .notification.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .header {
+            background-color: var(--darker-bg);
+            color: #fff;
+            padding: 8px 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            top: 30px;
+            border-bottom: 2px solid var(--main-color);
+            transition: top 0.3s ease;
+        }
+        
+        .header.notification-shown {
+            top: 60px;
+        }
+        
+        .header-content, .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+        
+        .logo-text {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        
+        .slogan {
+            font-size: 0.8rem;
+            color: #aaa;
+            font-style: italic;
+        }
+        
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            background-color: rgba(255,107,0,0.1);
+            padding: 3px 0;
+            margin-top: 3px;
+            font-size: 0.8rem;
+        }
+        
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .powered-by {
+            font-size: 0.7rem;
+            color: #777;
+        }
+        
+        .video-container {
+            flex: 1;
+            display: flex;
+            width: 100%;
+            height: calc(100vh - 100px);
+            margin-top: 50px;
+            margin-bottom: 50px;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+        }
+        
+        #player {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px;
+            background-color: rgba(10,10,10,0.7);
+            z-index: 999;
+        }
+        
+        .btn-humor {
+            background-color: var(--main-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+        
+        .btn-humor:hover {
+            background-color: #E05D00;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+        }
+        
+        .btn-whatsapp:hover {
+            background-color: #1EAE57;
+            color: white;
+        }
+        
+        .ad-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.96);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            display: none;
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .ad-content {
+            max-width: 95%;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .ad-title {
+            color: var(--main-color);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-align: center;
+            padding: 0 5px;
+            word-break: break-word;
+        }
+        
+        /* Styles pour le carrousel de publicités */
+        .ad-carousel {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ad-slides {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .ad-slide {
+            min-width: 100%;
+            padding: 0 10px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
+        .ad-message {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            min-height: 40px;
+            padding: 10px;
+            background-color: rgba(255, 107, 0, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid var(--main-color);
+        }
+        
+        .ad-nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .ad-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .ad-dot.active {
+            background-color: var(--main-color);
+            transform: scale(1.2);
+        }
+        
+        .ad-link {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 15px;
+            background-color: var(--main-color);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .ad-link:hover {
+            background-color: #E05D00;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
+        }
+        
+        .contact-icons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .contact-icon {
+            color: white;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+        }
+        
+        .contact-icon:hover {
+            transform: scale(1.2);
+        }
+        
+        .whatsapp-icon {
+            color: #25D366;
+        }
+        
+        .phone-icon {
+            color: #007BFF;
+        }
+        
+        .sms-icon {
+            color: #6C757D;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Modal styling */
+        .modal-humor {
+            background-color: rgba(0,0,0,0.85);
+        }
+        
+        .modal-content-humor {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 2px solid var(--main-color);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.2);
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .modal.show .modal-content-humor {
+            transform: scale(1);
+        }
+        
+        .modal-header-humor {
+            border-bottom: 1px solid rgba(255, 107, 0, 0.3);
+            padding: 15px;
+            background: linear-gradient(to right, #1a1a1a, #2a2a2a);
+            position: relative;
+        }
+        
+        .modal-header-humor::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--main-color), transparent);
+        }
+        
+        .modal-title-humor {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+            display: flex;
+            align-items: center;
+        }
+        
+        .modal-title-humor i {
+            margin-right: 8px;
+            font-size: 1.5rem;
+        }
+        
+        .modal-body-humor {
+            padding: 20px;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgwLDAsMCwwLjAzKSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgZmlsbD0idXJsKCNwYXR0ZXJuKSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==');
+        }
+        
+        .modal-footer-humor {
+            border-top: 1px solid rgba(255, 107, 0, 0.3);
+            padding: 12px 20px;
+            background: linear-gradient(to right, #1a1a1a, #2a2a2a);
+        }
+        
+        .share-instruction {
+            color: #ddd;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1rem;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        
+        .share-instruction::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--main-color);
+        }
+        
+        .input-group-humor {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .input-humor {
+            background-color: rgba(30, 30, 30, 0.8);
+            color: white;
+            border: 1px solid #444;
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .input-humor:focus {
+            background-color: rgba(40, 40, 40, 0.8);
+            color: white;
+            border-color: var(--main-color);
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 0, 0.25);
+            outline: none;
+        }
+        
+        .input-group-text-humor {
+            background: linear-gradient(to right, #FF6B00, #E05D00);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .input-group-text-humor:hover {
+            background: linear-gradient(to right, #E05D00, #C04F00);
+            transform: translateY(-1px);
+        }
+        
+        .input-group-text-humor i {
+            margin-right: 6px;
+        }
+        
+        .btn-close-custom {
+            color: #aaa;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-close-custom:hover {
+            color: var(--main-color);
+            transform: rotate(90deg);
+        }
+        
+        .whatsapp-share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            border-radius: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-size: 0.9rem;
+        }
+        
+        .whatsapp-share-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #25D366, #128C7E);
+            z-index: -1;
+            transition: all 0.3s;
+        }
+        
+        .whatsapp-share-btn:hover::before {
+            background: linear-gradient(to right, #128C7E, #25D366);
+        }
+        
+        .whatsapp-share-btn i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .whatsapp-share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+        
+        .modal-footer-note {
+            font-size: 0.7rem;
+            color: #777;
+            text-align: center;
+            margin-top: 8px;
+        }
+        
+        /* Animation d'entrée */
+        @keyframes modalEnter {
+            0% { opacity: 0; transform: translateY(-50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal.show .modal-content-humor {
+            animation: modalEnter 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
 
-    /* Masquer les éléments YouTube de manière plus légère */
-    .ytp-chrome-top,
-    .ytp-title-text,
-    .ytp-watermark {
-      display: none !important;
-    }
+        /* Bouton avance rapide - Version finale */
+        .forward-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 90px;
+            background-color: rgba(255, 107, 0, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .forward-btn:hover {
+            background-color: rgba(255, 107, 0, 0.9);
+            transform: scale(1.1);
+        }
+        
+        .forward-btn.active {
+            background-color: rgba(0, 200, 0, 0.7);
+            animation: pulse 0.5s infinite;
+        }
+        
+        .forward-btn i {
+            margin-right: -3px;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
 
-    /* Notification */
-    .notification-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 4000;
-      display: flex;
-      justify-content: center;
-    }
-    
-    .notification {
-      background-color: #dc3545;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 0 0 5px 5px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      display: none;
-      animation: slideDown 0.5s ease-out;
-    }
-    
-    @keyframes slideDown {
-      from { transform: translateY(-100%); }
-      to { transform: translateY(0); }
-    }
+        @media (max-width: 768px) {
+            .video-container {
+                height: calc(100vh - 90px);
+                margin-top: 40px;
+                margin-bottom: 40px;
+            }
+            
+            .header {
+                top: 25px;
+            }
+            
+            .header.notification-shown {
+                top: 55px;
+            }
+            
+            .logo-text {
+                font-size: 1.2rem;
+            }
+            
+            .slogan {
+                font-size: 0.7rem;
+            }
+            
+            .controls {
+                bottom: 40px;
+                gap: 5px;
+                padding: 5px;
+            }
+            
+            .btn-humor {
+                padding: 5px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .contact-icons {
+                gap: 10px;
+            }
+            
+            .contact-icon {
+                font-size: 1.1rem;
+            }
+            
+            .modal-title-humor {
+                font-size: 1.2rem;
+            }
+            
+            .modal-title-humor i {
+                font-size: 1.3rem;
+            }
+            
+            .share-instruction {
+                font-size: 0.9rem;
+            }
+            
+            .forward-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1.1rem;
+                right: 10px;
+                bottom: 80px;
+            }
+            
+            .ad-title {
+                font-size: 1.3rem;
+                margin-bottom: 8px;
+            }
+            
+            .ad-message {
+                font-size: 0.9rem;
+                padding: 8px;
+            }
+            
+            .ad-link {
+                padding: 5px 12px;
+                font-size: 0.8rem;
+            }
+        }
 
-    header {
-      flex-shrink: 0;
-      width: 100%;
-      text-align: center;
-      padding: 10px 0;
-      backdrop-filter: blur(8px);
-      background: rgba(18,18,18,0.7);
-      user-select: none;
-      z-index: 2000;
-    }
-    header h1 {
-      margin: 0;
-      font-weight: 600;
-      font-size: 1.8rem;
-      letter-spacing: 1.5px;
-    }
-    header p {
-      margin: 0;
-      font-weight: 400;
-      font-size: 1rem;
-      opacity: 0.7;
-    }
-    marquee {
-      margin-top: 6px;
-      color: #f0a500;
-      font-weight: 600;
-      font-size: 1rem;
-      user-select: none;
-    }
-
-    /* Container vidéo & pub */
-    .content-wrapper {
-      flex-grow: 1;
-      position: relative;
-      background: #000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-    #contentArea {
-      width: 100vw;
-      height: 65vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-    
-    iframe, .pub-message {
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 0;
-      box-sizing: border-box;
-    }
-
-    /* Style spécifique pour les Shorts */
-    .short-container {
-      width: 100%;
-      max-width: 400px;
-      height: 65vh;
-      margin: 0 auto;
-    }
-
-    .pub-message {
-      background: #222;
-      color: #f0a500;
-      font-weight: 700;
-      font-size: 1.6rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      user-select: none;
-    }
-    .pub-message a {
-      color: #ffb347;
-      text-decoration: underline;
-      margin-top: 10px;
-      font-weight: 600;
-    }
-    .pub-message a:hover {
-      color: #ffd46f;
-    }
-
-    #skipBtn {
-      margin-top: 20px;
-      background: #f0a500;
-      border: none;
-      color: #121212;
-      font-weight: 700;
-      font-size: 1.2rem;
-      padding: 10px 25px;
-      border-radius: 50px;
-      cursor: not-allowed;
-      user-select: none;
-      transition: background-color 0.3s, transform 0.2s;
-      pointer-events: none;
-      position: relative;
-      bottom: 25px;
-      align-self: center;
-      width: fit-content;
-    }
-    #skipBtn.enabled {
-      cursor: pointer;
-      pointer-events: auto;
-    }
-    #skipBtn.enabled:hover {
-      background-color: #ffbf47;
-      transform: scale(1.05);
-    }
-
-    /* Barre de contrôle */
-    #controlBar {
-      position: fixed;
-      bottom: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(240, 165, 0, 0.85);
-      padding: 10px 30px;
-      border-radius: 40px;
-      box-shadow: 0 0 15px rgba(240, 165, 0, 0.7);
-      display: flex;
-      gap: 30px;
-      z-index: 3000;
-      user-select: none;
-    }
-    #controlBar button {
-      background: transparent;
-      border: none;
-      color: #121212;
-      font-size: 2.5rem;
-      cursor: pointer;
-      transition: color 0.3s ease, transform 0.2s ease;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
-    }
-    #controlBar button:hover {
-      color: #fff;
-      transform: scale(1.2);
-    }
-
-    /* Bouton partager centré */
-    #shareBtnContainer {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-      margin-bottom: 20px;
-    }
-    
-    #shareBtn {
-      background: rgba(240, 165, 0, 0.85);
-      color: #121212;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      font-size: 0.9rem;
-      transition: all 0.3s;
-    }
-
-    #shareBtn:hover {
-      background: rgba(240, 165, 0, 1);
-      transform: scale(1.05);
-    }
-
-    footer {
-      font-size: 0.9rem;
-      opacity: 0.7;
-      letter-spacing: 1px;
-      padding: 15px 0;
-      text-align: center;
-    }
-
-    /* Boîte de partage */
-    .share-box {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(18, 18, 18, 0.95);
-      padding: 15px;
-      border-radius: 15px;
-      width: 90%;
-      max-width: 600px;
-      z-index: 2500;
-      backdrop-filter: blur(5px);
-      border: 1px solid #f0a500;
-      box-shadow: 0 0 15px rgba(240, 165, 0, 0.3);
-      display: none;
-    }
-
-    .share-box h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      color: #f0a500;
-      font-size: 1.2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .share-box p {
-      margin-bottom: 15px;
-      font-size: 0.9rem;
-      opacity: 0.9;
-    }
-
-    .share-box input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #444;
-      background: #222;
-      color: white;
-      margin-bottom: 10px;
-    }
-
-    .share-box button {
-      background: #f0a500;
-      color: #121212;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .share-box button:hover {
-      background: #ffbf47;
-    }
-
-    .close-btn {
-      background: #ff4444 !important;
-      color: white !important;
-      padding: 5px 10px !important;
-      font-size: 0.8rem !important;
-      border-radius: 50% !important;
-      width: 25px;
-      height: 25px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .close-btn:hover {
-      background: #ff6666 !important;
-    }
-
-    @media (max-width: 768px) {
-      header h1 {
-        font-size: 1.5rem;
-        padding: 0 10px;
-      }
-      
-      header p {
-        font-size: 0.9rem;
-      }
-      
-      marquee {
-        font-size: 0.8rem;
-      }
-      
-      #contentArea {
-        height: 55vh;
-      }
-      
-      .short-container {
-        max-width: 100%;
-        height: 55vh;
-      }
-      
-      #controlBar {
-        bottom: 60px;
-        padding: 8px 20px;
-        gap: 25px;
-      }
-      
-      #controlBar button {
-        font-size: 2rem;
-      }
-      
-      #shareBtn {
-        font-size: 0.8rem;
-        padding: 8px 15px;
-      }
-      
-      .share-box {
-        width: 90%;
-        padding: 15px;
-      }
-      
-      footer {
-        font-size: 0.8rem;
-        padding: 10px 5px;
-      }
-    }
-
-    @media (max-width: 576px) {
-      #contentArea {
-        height: 50vh;
-      }
-      
-      .short-container {
-        height: 50vh;
-      }
-      
-      #controlBar {
-        bottom: 50px;
-        gap: 20px;
-        padding: 6px 15px;
-      }
-      
-      #controlBar button {
-        font-size: 1.8rem;
-      }
-      
-      .pub-message {
-        font-size: 1.2rem;
-        padding: 0 15px;
-        text-align: center;
-      }
-      
-      #skipBtn {
-        font-size: 0.9rem;
-        padding: 8px 15px;
-      }
-    }
-  </style>
+        @media (max-width: 480px) {
+            .video-container {
+                height: calc(100vh - 80px);
+                margin-top: 35px;
+                margin-bottom: 35px;
+            }
+            
+            .header {
+                top: 20px;
+                padding: 5px 0;
+            }
+            
+            .header.notification-shown {
+                top: 50px;
+            }
+            
+            .logo-text {
+                font-size: 1.1rem;
+            }
+            
+            .marquee {
+                font-size: 0.7rem;
+            }
+            
+            .ad-title {
+                font-size: 1.1rem;
+            }
+            
+            .ad-content {
+                padding: 10px;
+            }
+            
+            .ad-message {
+                font-size: 0.85rem;
+                min-height: 35px;
+            }
+            
+            .forward-btn {
+                bottom: 70px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-  <!-- Notification -->
-  <div class="notification-container">
-    <div id="notification" class="notification alert alert-danger" role="alert">
-      <i class="fas fa-exclamation-circle me-2"></i>
-      <span id="notification-text">Message de notification</span>
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notification-message"></span>
+        <button class="notification-close" onclick="hideNotification()">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
-  </div>
 
-  <header>
-    <h1><i class="fa-solid fa-face-laugh-beam"></i> Humour & Gags</h1>
-    <p>Riez sans limite avec nos vidéos !</p>
-    <marquee direction="left" scrollamount="6" behavior="scroll" onmouseover="this.stop()" onmouseout="this.start()">
-      Bienvenue sur notre chaîne de vidéos humoristiques — Préparez-vous à rire sans limite !
-    </marquee>
-  </header>
-
-  <div class="content-wrapper">
-    <div id="contentArea"></div>
-    <div id="shareBtnContainer">
-      <button id="shareBtn">
-        <i class="fa-solid fa-share"></i> Partager une vidéo
-      </button>
-    </div>
-  </div>
-
-  <div class="share-box" id="shareBox">
-    <h3>
-      <span>Partagez avec la communauté</span>
-      <button class="close-btn" id="closeShareBox" aria-label="Fermer">&times;</button>
-    </h3>
-    <p>Envoyez-nous vos liens YouTube (vidéos ou shorts) humoristiques</p>
-    <input type="text" id="videoLink" placeholder="Coller le lien YouTube ici..." />
-    <input type="text" id="videoTitle" placeholder="Titre de la vidéo (optionnel)" />
-    <button id="sendBtn">Envoyer via WhatsApp</button>
-  </div>
-
-  <div id="controlBar" aria-label="Contrôles vidéo">
-    <button id="playPauseBtn" aria-label="Pause la vidéo"><i class="fa-solid fa-pause"></i></button>
-    <button id="nextBtn" aria-label="Vidéo suivante"><i class="fa-solid fa-forward"></i></button>
-  </div>
-
-  <footer class="text-center">
-    © 2025 - Humour & Gags | Créé par M. Seddik Elidrissi
-  </footer>
-
-  <!-- YouTube IFrame API -->
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    const videos = [
-      "Hn5gkhESyYA",
-      "UcHaW8z9TVI",
-      "g3Z2H0oVXao",
-      "fTOlvoBJ5oA",
-      "qAY-epA0CBI",
-      "9NZBRW99TPw&t"
-    ];
-
-    const pubs = [
-      { texte: "Découvrez notre site ami Radio Coran !", lien: "https://radiocoran.vercel.app" },
-      { texte: "Devenir un partenaire et publier votre site ici !", lien: "https://mescreations.vercel.app" },
-      { texte: "Un clic pour vendre..un clic pour acheter.. Découvrez votre market entre particuliers", lien: "https://lemarket.vercel.app" }
-    ];
-
-    let player;
-    let skipBtnTimeout;
-    const contentArea = document.getElementById("contentArea");
-    const controlBar = document.getElementById("controlBar");
-    const playPauseBtn = document.getElementById("playPauseBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const shareBox = document.getElementById("shareBox");
-    const closeShareBox = document.getElementById("closeShareBox");
-    const sendBtn = document.getElementById("sendBtn");
-    const videoLink = document.getElementById("videoLink");
-    const videoTitle = document.getElementById("videoTitle");
-    const notification = document.getElementById("notification");
-    const notificationText = document.getElementById("notification-text");
-    const shareBtn = document.getElementById("shareBtn");
-
-    let isPlaying = true;
-    let isPub = false;
-    let videosSinceLastPub = 0;
-    let currentVideoIsShort = false;
-
-    function showNotification(message, duration = 3000) {
-      notificationText.textContent = message;
-      notification.style.display = 'flex';
-      
-      setTimeout(() => {
-        notification.style.display = 'none';
-      }, duration);
-    }
-
-    function extractYouTubeId(url) {
-      if (url.length === 11 && !url.includes('/') && !url.includes('=')) {
-        return url;
-      }
-      
-      const patterns = [
-        /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i,
-        /^([^"&?\/\s]{11})$/,
-        /[?&]v=([^"&?\/\s]{11})/,
-        /[?&]vi=([^"&?\/\s]{11})/,
-        /embed\/([^"&?\/\s]{11})/,
-        /youtu\.be\/([^"&?\/\s]{11})/,
-        /shorts\/([^"&?\/\s]{11})/
-      ];
-      
-      for (const pattern of patterns) {
-        const match = url.match(pattern);
-        if (match && match[1]) {
-          return match[1];
-        }
-      }
-      
-      return null;
-    }
-
-    function setupShareEvents() {
-      // Bouton partager
-      shareBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        shareBox.style.display = 'block';
-      });
-      
-      // Fermer la boîte de partage
-      closeShareBox.addEventListener('click', function(e) {
-        e.preventDefault();
-        shareBox.style.display = 'none';
-      });
-
-      // Envoyer via WhatsApp
-      sendBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const link = videoLink.value.trim();
-        const title = videoTitle.value.trim() || 'Vidéo humoristique';
-        
-        if (!link) {
-          showNotification('Veuillez entrer un lien YouTube valide');
-          return false;
-        }
-
-        const videoId = extractYouTubeId(link);
-        
-        if (!videoId) {
-          showNotification('Lien YouTube non valide. Formats acceptés:\n- Vidéos: https://youtu.be/ID\n- Shorts: https://youtube.com/shorts/ID\n- ID seul (11 caractères)');
-          return false;
-        }
-
-        const message = `Bonjour, je souhaite partager cette vidéo ${link.includes('shorts') ? 'YouTube Short' : 'YouTube'}:\n\nTitre: ${title}\nLien: ${link.includes('shorts') ? link : 'https://youtu.be/'+videoId}`;
-        const whatsappUrl = `https://wa.me/212608975435?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
-        
-        videoLink.value = '';
-        videoTitle.value = '';
-        shareBox.style.display = 'none';
-        showNotification('Votre vidéo a été partagée avec succès !');
-      });
-    }
-
-    function onYouTubeIframeAPIReady() {
-      setupShareEvents();
-      playNextContent();
-      
-      setTimeout(() => {
-        showNotification('Bienvenue sur Humour & Gags ! Profitez des vidéos et shorts.');
-      }, 1000);
-    }
-
-    function createPlayer(videoId) {
-      currentVideoIsShort = videoId.includes('shorts') || 
-                          (videoLink.value.includes('shorts') && !videoId.includes('shorts'));
-      
-      contentArea.innerHTML = currentVideoIsShort ? 
-        `<div class="short-container"><div id="player"></div></div>` : 
-        `<div id="player"></div>`;
-      
-      player = new YT.Player('player', {
-        height: '100%',
-        width: '100%',
-        videoId: videoId.replace('shorts/', ''),
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          modestbranding: 1,
-          rel: 0,
-          disablekb: 1,
-          fs: 0,
-          iv_load_policy: 3,
-          playsinline: 1,
-          showinfo: 0,
-          enablejsapi: 1
-        },
-        events: {
-          'onStateChange': onPlayerStateChange,
-          'onReady': (event) => {
-            isPlaying = true;
-            updatePlayPauseIcon();
-            
-            // Solution simplifiée pour masquer les éléments
-            setTimeout(() => {
-              try {
-                const iframe = document.querySelector('iframe');
-                if (iframe) {
-                  const style = document.createElement('style');
-                  style.textContent = `
-                    .ytp-chrome-top, .ytp-title-text, .ytp-watermark {
-                      display: none !important;
-                    }
-                  `;
-                  iframe.contentDocument.head.appendChild(style);
-                }
-              } catch(e) {
-                console.log("Masquage des éléments YouTube échoué");
-              }
-            }, 1000);
-            
-            if (currentVideoIsShort) {
-              const isMobile = window.innerWidth <= 768;
-              const width = isMobile ? window.innerWidth : 400;
-              const height = isMobile ? width * 1.77 : 711;
-              event.target.setSize(width, height);
-            }
-          }
-        }
-      });
-    }
-
-    function showPub() {
-      isPub = true;
-      currentVideoIsShort = false;
-      const pubIndex = Math.floor(Math.random() * pubs.length);
-      const pub = pubs[pubIndex];
-      
-      const isMobile = window.innerWidth <= 768;
-      const pubText = isMobile ? pub.texte.replace(/!.*/, "!") : pub.texte;
-      
-      contentArea.innerHTML = `
-        <div class="pub-message" role="alert" aria-live="assertive">
-          ${pubText} <br>
-          <a href="${pub.lien}" target="_blank" rel="noopener noreferrer">
-            ${isMobile ? "Visiter" : "Cliquez ici"}
-          </a>
+    <!-- Header -->
+    <header class="header" id="main-header">
+        <div class="container header-content">
+            <div class="logo-container">
+                <i class="fas fa-laugh-squint me-2" style="color: var(--main-color); font-size: 1.2rem;"></i>
+                <h1 class="logo-text">TV HUMOUR</h1>
+            </div>
+            <p class="slogan">Le rire à portée de clic, 24h/24 !</p>
+            <div class="marquee">
+                <span>🌟 Bienvenue sur TV Humour - La chaîne qui vous fait rire sans interruption ! 🌟</span>
+            </div>
         </div>
-      `;
-      
-      const skipBtn = document.createElement('button');
-      skipBtn.id = 'skipBtn';
-      skipBtn.disabled = true;
-      skipBtn.textContent = isMobile ? `Pub (5)` : `Passer la pub (5)`;
-      skipBtn.style.opacity = '0.5';
-      skipBtn.style.pointerEvents = 'none';
-      
-      document.getElementById('shareBtnContainer').prepend(skipBtn);
-      controlBar.style.display = 'flex';
+    </header>
 
-      let countdown = 5;
-      
-      skipBtnTimeout = setInterval(() => {
-        countdown--;
-        skipBtn.textContent = isMobile ? `Pub (${countdown})` : `Passer la pub (${countdown})`;
-        if (countdown <= 0) {
-          skipBtn.textContent = isMobile ? 'Passer' : 'Passer la pub';
-          skipBtn.disabled = false;
-          skipBtn.style.opacity = '1';
-          skipBtn.style.pointerEvents = 'auto';
-          skipBtn.classList.add('enabled');
-          clearInterval(skipBtnTimeout);
+    <!-- Main Content -->
+    <div class="video-container">
+        <div class="video-wrapper">
+            <!-- Player YouTube - élément vide qui sera remplacé par l'API -->
+            <div id="player"></div>
+            
+            <!-- Bouton avance rapide avec mode continu -->
+            <button id="forwardBtn" class="forward-btn" title="Avance rapide (clic pour activer/désactiver)">
+                <i class="fas fa-forward"></i>
+            </button>
+            
+            <!-- Ad Overlay avec carrousel -->
+            <div class="ad-overlay" id="adOverlay">
+                <div class="ad-content">
+                    <h2 class="ad-title">
+                        <i class="fas fa-ad"></i> VOTRE PUBLICITÉ ICI
+                    </h2>
+                    
+                    <div class="ad-carousel">
+                        <div class="ad-slides" id="adSlides">
+                            <!-- Slide 1 -->
+                            <div class="ad-slide">
+                                <p class="ad-message">Le market entre particuler. un clic pour vendre, un clic pour acheter... !</p>
+                                <a href="https://lemarket.vercel.app" class="ad-link" target="_blank">
+                                    Visitez le site
+                                </a>
+                            </div>
+                            
+                            <!-- Slide 2 -->
+                            <div class="ad-slide">
+                                <p class="ad-message">Radio Coran.. écoute sur tél ou ordi, récitations variées !</p>
+                                <a href="https://radiocoran.vercel.app" class="ad-link" target="_blank">
+                                    Visitez le site
+                                </a>
+                            </div>
+                            
+                            <!-- Slide 3 -->
+                            <div class="ad-slide">
+                                <p class="ad-message">Découvez mes créations - l'art qui parle sans dire un mot !</p>
+                                <a href="https://mescreations.vercel.app" class="ad-link" target="_blank">
+                                    Visitez le site
+                                </a>
+                            </div>
+                            
+                            <!-- Slide 4 -->
+                            <div class="ad-slide">
+                                <p class="ad-message">Ouvre la porte à ma créativité !</p>
+                                <a href="https://mescreations.vercel.app" class="ad-link" target="_blank">
+                                    Visitez le site
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="ad-nav" id="adDots">
+                            <!-- Les points de navigation seront ajoutés dynamiquement -->
+                        </div>
+                    </div>
+                    
+                    <button id="nextVideoBtn" class="btn btn-humor mt-3">
+                        <i class="fas fa-forward me-1"></i> Vidéo suivante
+                    </button>
+                    
+                    <div class="contact-icons">
+                        <a href="https://wa.me/212608975435" class="contact-icon whatsapp-icon" target="_blank" title="Contact WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="tel:212608975435" class="contact-icon phone-icon" title="Appeler">
+                            <i class="fas fa-phone"></i>
+                        </a>
+                        <a href="sms:212608975435" class="contact-icon sms-icon" title="Envoyer SMS">
+                            <i class="fas fa-sms"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button id="newVideoBtn" class="btn btn-humor">
+            <i class="fas fa-random me-1"></i> Nouveau gag
+        </button>
+        <button id="playPauseBtn" class="btn btn-humor">
+            <i class="fas fa-play me-1"></i> Lecture
+        </button>
+        <button class="btn btn-humor" data-bs-toggle="modal" data-bs-target="#shareModal">
+            <i class="fas fa-share-alt me-1"></i> Partager un gag
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="powered-by">Powered by M.Seddik Elidrissi</div>
+        </div>
+    </footer>
+
+    <!-- Share Video Modal -->
+    <div class="modal fade modal-humor" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-humor">
+                <div class="modal-header modal-header-humor">
+                    <h5 class="modal-title modal-title-humor" id="shareModalLabel">
+                        <i class="fas fa-share-alt"></i>Partager un gag
+                    </h5>
+                    <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body modal-body-humor">
+                    <p class="share-instruction">Partagez votre vidéo préférée avec nous !</p>
+                    
+                    <div class="input-group input-group-humor mb-3">
+                        <input type="text" class="form-control input-humor" id="videoUrl" placeholder="Collez le lien YouTube ici...">
+                        <button id="whatsappShare" class="input-group-text input-group-text-humor">
+                            <i class="fab fa-whatsapp"></i> Envoyer
+                        </button>
+                    </div>
+                    
+                    <button id="whatsappShareBtn" class="whatsapp-share-btn mb-2">
+                        <i class="fab fa-whatsapp"></i> Partager via WhatsApp
+                    </button>
+                    
+                    <p class="modal-footer-note">Nous ajouterons les meilleures suggestions à notre playlist !</p>
+                </div>
+                <div class="modal-footer modal-footer-humor">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Liste de vidéos d'humour et gags (IDs seulement)
+        const videoList = [
+            'g3Z2H0oVXao', // Remplacez par des IDs valides
+            'qAY-epA0CBI',
+            'w4pO09UH7RA',
+            '4d8QiOFgbzs',
+            'jvS71ktE1Bk'
+        ];
+
+        let player;
+        let currentVideoIndex;
+        let isPlaying = false;
+        let fastForwardInterval = null;
+        let isFastForwarding = false;
+        const FAST_FORWARD_SPEED = 4; // Vitesse 4x
+        const FAST_FORWARD_INTERVAL = 200; // ms (plus court = plus fluide)
+
+        // Variables pour le carrousel de publicités
+        let currentAdSlide = 0;
+        let adInterval;
+        const AD_CHANGE_INTERVAL = 5000; // 5 secondes entre chaque pub
+
+        // Fonctions pour gérer les notifications
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const messageElement = document.getElementById('notification-message');
+            const header = document.getElementById('main-header');
+            
+            messageElement.textContent = message;
+            notification.classList.add('show');
+            header.classList.add('notification-shown');
+            
+            // Masquer automatiquement après 5 secondes
+            setTimeout(hideNotification, 5000);
         }
-      }, 1000);
-
-      skipBtn.addEventListener('click', () => {
-        clearInterval(skipBtnTimeout);
-        skipBtn.remove();
-        playNextContent();
-      });
-
-      setTimeout(() => {
-        if (!skipBtn.disabled) return;
-        clearInterval(skipBtnTimeout);
-        skipBtn.remove();
-        playNextContent();
-      }, isMobile ? 5000 : 8000);
-    }
-
-    function onPlayerStateChange(event) {
-      if (event.data === YT.PlayerState.ENDED) {
-        isPlaying = false;
-        updatePlayPauseIcon();
-        playNextContent();
-      } else if (event.data === YT.PlayerState.PLAYING) {
-        isPlaying = true;
-        updatePlayPauseIcon();
-      } else if (event.data === YT.PlayerState.PAUSED) {
-        isPlaying = false;
-        updatePlayPauseIcon();
-      }
-    }
-
-    function updatePlayPauseIcon() {
-      if (isPlaying) {
-        playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-        playPauseBtn.setAttribute('aria-label', 'Pause la vidéo');
-      } else {
-        playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-        playPauseBtn.setAttribute('aria-label', 'Jouer la vidéo');
-      }
-    }
-
-    function togglePlayPause() {
-      if (!player || isPub) return;
-      if (isPlaying) {
-        player.pauseVideo();
-        isPlaying = false;
-      } else {
-        player.playVideo();
-        isPlaying = true;
-      }
-      updatePlayPauseIcon();
-    }
-
-    function playNextContent() {
-      isPub = false;
-      controlBar.style.display = 'flex';
-
-      videosSinceLastPub++;
-
-      if (videosSinceLastPub >= 4) {
-        videosSinceLastPub = 0;
-        showPub();
-      } else {
-        const videoId = videos[Math.floor(Math.random() * videos.length)];
-        createPlayer(videoId);
-      }
-    }
-
-    // Contrôles vidéo
-    playPauseBtn.addEventListener('click', togglePlayPause);
-    nextBtn.addEventListener('click', playNextContent);
-
-    // Gestion du tactile pour mobile
-    let lastTap = 0;
-    [playPauseBtn, nextBtn].forEach(btn => {
-      btn.addEventListener('touchend', function(e) {
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTap;
-        if (tapLength < 500 && tapLength > 0) {
-          e.preventDefault();
-          return;
+        
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            const header = document.getElementById('main-header');
+            
+            notification.classList.remove('show');
+            header.classList.remove('notification-shown');
         }
-        lastTap = currentTime;
-        if (btn === playPauseBtn) togglePlayPause();
-        else playNextContent();
-      });
-    });
 
-    if (window.YT && YT.Player) {
-      onYouTubeIframeAPIReady();
-    } else {
-      // Fallback si l'API YouTube ne se charge pas
-      const tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-  </script>
+        // Chargement de l'API YouTube
+        function loadYouTubeAPI() {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+
+        // Initialisation du player YouTube
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 0,
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'enablejsapi': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            loadRandomVideo();
+            setupEventListeners();
+            initAdCarousel(); // Initialiser le carrousel de pubs
+        }
+
+        function setupEventListeners() {
+            document.getElementById('forwardBtn').addEventListener('click', toggleFastForward);
+            document.getElementById('newVideoBtn').addEventListener('click', loadNewVideo);
+            document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
+            document.getElementById('nextVideoBtn').addEventListener('click', loadNewVideo);
+            document.getElementById('whatsappShare').addEventListener('click', shareViaWhatsApp);
+            document.getElementById('whatsappShareBtn').addEventListener('click', shareViaWhatsApp);
+        }
+
+        function loadRandomVideo() {
+            if (isFastForwarding) toggleFastForward();
+            
+            currentVideoIndex = Math.floor(Math.random() * videoList.length);
+            const videoId = videoList[currentVideoIndex];
+            
+            if (player && player.loadVideoById) {
+                player.loadVideoById({
+                    videoId: videoId,
+                    suggestedQuality: 'highres'
+                });
+                isPlaying = true;
+                updatePlayPauseButton();
+            } else {
+                console.error("Player YouTube non initialisé");
+                showNotification("Erreur de chargement de la vidéo");
+            }
+        }
+
+        function loadNewVideo() {
+            if (document.getElementById('adOverlay').style.display === 'flex') {
+                document.getElementById('adOverlay').style.display = 'none';
+            }
+            loadRandomVideo();
+        }
+
+        function toggleFastForward() {
+            const forwardBtn = document.getElementById('forwardBtn');
+            
+            if (isFastForwarding) {
+                // Désactiver l'avance rapide
+                clearInterval(fastForwardInterval);
+                forwardBtn.classList.remove('active');
+                forwardBtn.innerHTML = '<i class="fas fa-forward"></i>';
+                isFastForwarding = false;
+            } else {
+                // Activer l'avance rapide
+                forwardBtn.classList.add('active');
+                forwardBtn.innerHTML = `<i class="fas fa-forward"></i> ×${FAST_FORWARD_SPEED}`;
+                isFastForwarding = true;
+                
+                // Avancer la vidéo à la vitesse configurée
+                fastForwardInterval = setInterval(function() {
+                    if (player && player.getCurrentTime) {
+                        const currentTime = player.getCurrentTime();
+                        player.seekTo(currentTime + (FAST_FORWARD_SPEED * 0.25), true);
+                    }
+                }, FAST_FORWARD_INTERVAL);
+            }
+        }
+
+        // Fonctions pour le carrousel de publicités
+        function initAdCarousel() {
+            const slides = document.querySelectorAll('.ad-slide');
+            const dotsContainer = document.getElementById('adDots');
+            
+            // Créer les points de navigation
+            slides.forEach((slide, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('ad-dot');
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    goToAdSlide(index);
+                });
+                dotsContainer.appendChild(dot);
+            });
+            
+            // Démarrer le carrousel automatique
+            startAdCarousel();
+        }
+        
+        function startAdCarousel() {
+            adInterval = setInterval(nextAdSlide, AD_CHANGE_INTERVAL);
+        }
+        
+        function nextAdSlide() {
+            const slides = document.querySelectorAll('.ad-slide');
+            currentAdSlide = (currentAdSlide + 1) % slides.length;
+            updateAdCarousel();
+        }
+        
+        function goToAdSlide(index) {
+            currentAdSlide = index;
+            updateAdCarousel();
+            resetAdInterval();
+        }
+        
+        function updateAdCarousel() {
+            const slides = document.getElementById('adSlides');
+            const dots = document.querySelectorAll('.ad-dot');
+            
+            slides.style.transform = `translateX(-${currentAdSlide * 100}%)`;
+            
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentAdSlide);
+            });
+        }
+        
+        function resetAdInterval() {
+            clearInterval(adInterval);
+            startAdCarousel();
+        }
+        
+        function showAdOverlay() {
+            document.getElementById('adOverlay').style.display = 'flex';
+            currentAdSlide = 0;
+            updateAdCarousel();
+            resetAdInterval();
+        }
+        
+        function hideAdOverlay() {
+            document.getElementById('adOverlay').style.display = 'none';
+            clearInterval(adInterval);
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                // Désactiver l'avance rapide si en pause
+                if (isFastForwarding) {
+                    toggleFastForward();
+                }
+            } else if (event.data === YT.PlayerState.ENDED) {
+                showAdOverlay();
+                isPlaying = false;
+                // Désactiver l'avance rapide si vidéo terminée
+                if (isFastForwarding) {
+                    toggleFastForward();
+                }
+            }
+            updatePlayPauseButton();
+        }
+
+        function updatePlayPauseButton() {
+            const btn = document.getElementById('playPauseBtn');
+            if (isPlaying) {
+                btn.innerHTML = '<i class="fas fa-pause me-1"></i> Pause';
+            } else {
+                btn.innerHTML = '<i class="fas fa-play me-1"></i> Lecture';
+            }
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        function shareViaWhatsApp(e) {
+            e.preventDefault();
+            const videoUrl = document.getElementById('videoUrl').value;
+            if (videoUrl) {
+                const message = `Bonjour TV Humour !\nJe vous propose ce gag hilarant :\n${videoUrl}\n\nCordialement`;
+                const whatsappUrl = `https://wa.me/212608975435?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            } else {
+                showNotification("Veuillez d'abord coller un lien YouTube");
+            }
+        }
+
+        // Charger l'API au démarrage
+        window.addEventListener('DOMContentLoaded', () => {
+            loadYouTubeAPI();
+        });
+    </script>
 </body>
 </html>
