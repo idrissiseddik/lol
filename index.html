@@ -140,31 +140,31 @@
         /* Nouvelles modifications pour le footer */
         .footer {
             background-color: var(--darker-bg);
-            padding: 15px 0; /* Augmentation de la hauteur */
+            padding: 15px 0;
             position: fixed;
             bottom: 0;
             width: 100%;
-            height: 60px; /* Hauteur fixe augmentée */
+            height: 60px;
             display: flex;
-            align-items: center; /* Centrage vertical */
-            justify-content: center; /* Centrage horizontal */
+            align-items: center;
+            justify-content: center;
             border-top: 1px solid rgba(255,107,0,0.2);
         }
         
         .footer-content {
             height: 100%;
             display: flex;
-            align-items: center; /* Centrage vertical */
-            justify-content: center; /* Centrage horizontal */
+            align-items: center;
+            justify-content: center;
         }
         
         .video-container {
             flex: 1;
             display: flex;
             width: 100%;
-            height: calc(100vh - 140px); /* Ajustement pour le footer plus grand */
+            height: calc(100vh - 140px);
             margin-top: 50px;
-            margin-bottom: 60px; /* Ajustement pour le footer plus grand */
+            margin-bottom: 60px;
             padding: 0;
             overflow: hidden;
         }
@@ -187,7 +187,7 @@
         
         .controls {
             position: fixed;
-            bottom: 60px; /* Ajustement pour le footer plus grand */
+            bottom: 60px;
             left: 0;
             right: 0;
             display: flex;
@@ -460,6 +460,27 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         
+        /* Style pour le placeholder visible */
+        .input-humor::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .input-humor::-webkit-input-placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .input-humor::-moz-placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .input-humor:-ms-input-placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .input-humor:-moz-placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
         .input-humor:focus {
             background-color: rgba(40, 40, 40, 0.8);
             color: white;
@@ -603,9 +624,9 @@
 
         @media (max-width: 768px) {
             .video-container {
-                height: calc(100vh - 130px); /* Ajustement pour mobile */
+                height: calc(100vh - 130px);
                 margin-top: 40px;
-                margin-bottom: 50px; /* Ajustement pour mobile */
+                margin-bottom: 50px;
             }
             
             .header {
@@ -625,7 +646,7 @@
             }
             
             .controls {
-                bottom: 50px; /* Ajustement pour mobile */
+                bottom: 50px;
                 gap: 5px;
                 padding: 5px;
             }
@@ -681,9 +702,9 @@
 
         @media (max-width: 480px) {
             .video-container {
-                height: calc(100vh - 120px); /* Ajustement pour mobile */
+                height: calc(100vh - 120px);
                 margin-top: 35px;
-                margin-bottom: 45px; /* Ajustement pour mobile */
+                margin-bottom: 45px;
             }
             
             .header {
@@ -721,7 +742,7 @@
             }
             
             .footer {
-                height: 50px; /* Ajustement pour mobile */
+                height: 50px;
             }
         }
     </style>
@@ -863,7 +884,7 @@
                     <p class="share-instruction">Partagez votre vidéo préférée avec nous !</p>
                     
                     <div class="input-group input-group-humor mb-3">
-                        <input type="text" class="form-control input-humor" id="videoUrl" placeholder="Collez le lien YouTube ici...">
+                        <input type="text" class="form-control input-humor" id="videoUrl" placeholder="Coller le lien YouTube ici">
                         <button id="whatsappShare" class="input-group-text input-group-text-humor">
                             <i class="fab fa-whatsapp"></i> Envoyer
                         </button>
